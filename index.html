@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chula MBA Surveys 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      padding: 1.5rem;
+      padding-top: calc(1.5rem + 52px);
+    }
+
+    /* ── Fixed language banner ── */
+    .lang-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: #1a1a2e;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .lang-label {
+      opacity: 0.6;
+      transition: opacity 0.2s;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .lang-label.active { opacity: 1; }
+    .lang-toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #444;
+      border-radius: 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s;
+    }
+    .lang-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .lang-toggle.th { background: #e85d75; }
+    .lang-toggle.th::after { transform: translateX(20px); }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      margin-bottom: 0.25rem;
+    }
+    .header p {
+      color: #666;
+      font-size: 0.85rem;
+    }
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 1.25rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-box {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: #e85d75;
+    }
+    .filters {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .filter-btn {
+      padding: 0.4rem 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-btn:hover { border-color: #e85d75; }
+    .filter-btn.active {
+      background: #e85d75;
+      color: white;
+      border-color: #e85d75;
+    }
+    .count {
+      font-size: 0.8rem;
+      color: #888;
+      width: 100%;
+      text-align: center;
+      padding: 0.25rem 0;
+    }
+
+    /* ── Desktop: table ── */
+    .table-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #1a1a2e;
+      color: white;
+      padding: 0.75rem 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { background: #2a2a4e; }
+    thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+    thead th.sorted .sort-arrow { opacity: 1; }
+    tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: #fdf2f4; }
+    tbody tr.hidden { display: none; }
+    td {
+      padding: 0.65rem 0.75rem;
+      font-size: 0.85rem;
+      vertical-align: top;
+    }
+    td.title { font-weight: 600; min-width: 160px; }
+    td.desc { color: #444; min-width: 200px; }
+    td.person, td.program { white-space: nowrap; }
+
+    /* ── Mobile: cards ── */
+    .cards { display: none; max-width: 1200px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .card.hidden { display: none; }
+    .card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+      color: #1a1a2e;
+    }
+    .card-meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .card-meta span { white-space: nowrap; }
+    .card-desc {
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.45;
+      margin-bottom: 0.6rem;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .card-badges { display: flex; flex-wrap: wrap; gap: 4px; }
+    .card-incentive {
+      font-size: 0.78rem;
+      color: #888;
+      width: 100%;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .cat-food { background: #fff3e0; color: #e65100; }
+    .cat-beverage { background: #e8f5e9; color: #2e7d32; }
+    .cat-lifestyle { background: #e3f2fd; color: #1565c0; }
+    .cat-consumer { background: #f3e5f5; color: #7b1fa2; }
+    .cat-health { background: #fce4ec; color: #c62828; }
+    .cat-finance { background: #fff8e1; color: #f57f17; }
+    .cat-pets { background: #e0f7fa; color: #00695c; }
+
+    .link-btn {
+      display: inline-block;
+      padding: 8px 18px;
+      background: #e85d75;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s;
+      white-space: nowrap;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .link-btn:hover { background: #d14460; }
+
+    @media (max-width: 860px) {
+      body { padding: 0.75rem; padding-top: calc(0.75rem + 52px); }
+      .header h1 { font-size: 1.3rem; }
+      .table-wrap { display: none; }
+      .cards { display: block; }
+      .link-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+      .count { margin-top: 0.25rem; }
+    }
+    @media (min-width: 861px) {
+      .controls {
+        flex-wrap: nowrap;
+        gap: 1rem;
+      }
+      .search-box { width: auto; flex: 1; min-width: 220px; }
+      .filters { width: auto; flex-wrap: nowrap; }
+      .count { width: auto; white-space: nowrap; text-align: right; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fixed language toggle banner -->
+<div class="lang-banner">
+  <span class="lang-label active" id="lbl-en" data-lang="en">&#127482;&#127480; EN</span>
+  <div class="lang-toggle" id="lang-toggle"></div>
+  <span class="lang-label" id="lbl-th" data-lang="th">&#127481;&#127469; TH</span>
+</div>
+
+<div class="header">
+  <h1 id="page-title">Chula MBA Surveys 2026</h1>
+  <p id="page-subtitle">Independent Study questionnaires from Chula MBA students</p>
+</div>
+
+<div class="controls">
+  <input type="text" class="search-box" id="search" placeholder="Search surveys...">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="all" data-en="All" data-th="All">All</button>
+    <button class="filter-btn" data-cat="food" data-en="Food" data-th="Food">Food</button>
+    <button class="filter-btn" data-cat="beverage" data-en="Beverage" data-th="Beverage">Beverage</button>
+    <button class="filter-btn" data-cat="health" data-en="Health" data-th="Health">Health</button>
+    <button class="filter-btn" data-cat="lifestyle" data-en="Lifestyle" data-th="Lifestyle">Lifestyle</button>
+    <button class="filter-btn" data-cat="consumer" data-en="Consumer" data-th="Consumer">Consumer</button>
+    <button class="filter-btn" data-cat="finance" data-en="Finance" data-th="Finance">Finance</button>
+    <button class="filter-btn" data-cat="pets" data-en="Pets" data-th="Pets">Pets</button>
+  </div>
+  <span class="count" id="count"></span>
+</div>
+
+<!-- Desktop table -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th data-sort="title" data-en="Title" data-th="&#3594;&#3639;&#3656;&#3629;&#3648;&#3619;&#3639;&#3656;&#3629;&#3591;">Title <span class="sort-arrow">&#9650;</span></th>
+        <th data-sort="person" data-en="Person" data-th="&#3612;&#3641;&#3657;&#3607;&#3635;">Person <span class="sort-arrow">&#9650;</span></th>
+        <th data-sort="program" data-en="Program" data-th="&#3650;&#3611;&#3619;&#3649;&#3585;&#3619;&#3617;">Program <span class="sort-arrow">&#9650;</span></th>
+        <th data-en="Description" data-th="&#3619;&#3634;&#3618;&#3621;&#3632;&#3648;&#3629;&#3637;&#3618;&#3604;">Description</th>
+        <th data-en="Categories" data-th="&#3627;&#3617;&#3623;&#3604;&#3627;&#3617;&#3641;&#3656;">Categories</th>
+        <th data-sort="time" data-en="Time" data-th="&#3648;&#3623;&#3621;&#3634;">Time <span class="sort-arrow">&#9650;</span></th>
+        <th data-en="Incentive" data-th="&#3586;&#3629;&#3591;&#3619;&#3634;&#3591;&#3623;&#3633;&#3621;">Incentive</th>
+        <th data-en="Link" data-th="&#3621;&#3636;&#3591;&#3585;&#3660;">Link</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- Mobile cards -->
+<div class="cards" id="cards"></div>
+
+<script>
+const surveys = [
+  {
+    title: "Reusable Straws",
+    title_th: "\u0e2b\u0e25\u0e2d\u0e14\u0e43\u0e0a\u0e49\u0e0b\u0e49\u0e33",
+    person: "Pleng",
+    program: "YMBA",
+    desc: "Survey on reusable straw usage behavior and attitudes toward sustainable alternatives.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e43\u0e0a\u0e49\u0e2b\u0e25\u0e2d\u0e14\u0e0b\u0e49\u0e33\u0e41\u0e25\u0e30\u0e17\u0e31\u0e28\u0e19\u0e04\u0e15\u0e34\u0e15\u0e48\u0e2d\u0e17\u0e32\u0e07\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e17\u0e35\u0e48\u0e22\u0e31\u0e48\u0e07\u0e22\u0e37\u0e19",
+    categories: ["lifestyle", "consumer"],
+    time: "1-2 min",
+    incentive: null,
+    link: "https://forms.gle/51GtsXyBAvNuVLFNA"
+  },
+  {
+    title: "Consumer Behavior Study",
+    title_th: "\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04",
+    person: "Faa",
+    program: "MBA ENG #19",
+    desc: "General consumer behavior questionnaire for MBA independent study research.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30 MBA",
+    categories: ["consumer"],
+    time: null,
+    incentive: null,
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSc32PhckZIOyjFbIDxTiztFzPULit33Lwgx3eJXSBqaJxWbYg/viewform"
+  },
+  {
+    title: "Health & Fitness Lifestyle",
+    title_th: "\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e41\u0e25\u0e30\u0e1f\u0e34\u0e15\u0e40\u0e19\u0e2a",
+    person: "Phak",
+    program: "Young Exec MBA",
+    desc: "Survey targeting health-conscious consumers about fitness lifestyle behaviors and preferences.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e1c\u0e39\u0e49\u0e23\u0e31\u0e01\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e41\u0e25\u0e30\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e19\u0e43\u0e08\u0e14\u0e49\u0e32\u0e19\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e",
+    categories: ["health", "lifestyle"],
+    time: "10-15 min",
+    incentive: "Starbucks Voucher 200 THB x5",
+    link: "https://forms.gle/6UQuxdLQrhMFvteX8"
+  },
+  {
+    title: "Frozen Yogurt Smoothie",
+    title_th: "\u0e42\u0e22\u0e40\u0e01\u0e34\u0e23\u0e4c\u0e15\u0e1b\u0e31\u0e48\u0e19",
+    person: "Kaimook",
+    program: "YMBA",
+    desc: "Consumer behavior and preferences regarding frozen yogurt smoothie consumption.",
+    desc_th: "\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e41\u0e25\u0e30\u0e04\u0e27\u0e32\u0e21\u0e0a\u0e2d\u0e1a\u0e02\u0e2d\u0e07\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e15\u0e48\u0e2d\u0e42\u0e22\u0e40\u0e01\u0e34\u0e23\u0e4c\u0e15\u0e1b\u0e31\u0e48\u0e19",
+    categories: ["food", "beverage"],
+    time: null,
+    incentive: "Starbucks Card 200 THB x5",
+    link: "https://forms.gle/zFvK8Ed34jQnUj9R9"
+  },
+  {
+    title: "Specialty Cheesecake Cafe",
+    title_th: "\u0e23\u0e49\u0e32\u0e19\u0e0a\u0e35\u0e2a\u0e40\u0e04\u0e49\u0e01\u0e2a\u0e1b\u0e40\u0e0a\u0e35\u0e22\u0e25\u0e15\u0e35\u0e49",
+    person: "Mint",
+    program: "MBA ENG #19",
+    desc: "Consumer behavior and interest in a specialty cheesecake cafe concept. Explores purchasing habits and preferences for artisanal cheesecake.",
+    desc_th: "\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e41\u0e25\u0e30\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e19\u0e43\u0e08\u0e02\u0e2d\u0e07\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e15\u0e48\u0e2d\u0e23\u0e49\u0e32\u0e19\u0e0a\u0e35\u0e2a\u0e40\u0e04\u0e49\u0e01\u0e04\u0e32\u0e40\u0e1f\u0e48\u0e2a\u0e1b\u0e40\u0e0a\u0e35\u0e22\u0e25\u0e15\u0e35\u0e49",
+    categories: ["food", "consumer"],
+    time: null,
+    incentive: "Starbucks E-Voucher 200 THB x5",
+    link: "https://forms.gle/W6c78TtAiNP3MhxV9"
+  },
+  {
+    title: "Post-Procedure Recovery Drink",
+    title_th: "\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e1f\u0e37\u0e49\u0e19\u0e1f\u0e39\u0e2b\u0e25\u0e31\u0e07\u0e2b\u0e31\u0e15\u0e16\u0e01\u0e32\u0e23",
+    person: "Orm-aem",
+    program: "YMBA 31/1",
+    desc: "Research on developing a beverage concept for post-medical procedure recovery. Targets health-conscious consumers.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e1f\u0e37\u0e49\u0e19\u0e1f\u0e39\u0e2b\u0e25\u0e31\u0e07\u0e17\u0e33\u0e2b\u0e31\u0e15\u0e16\u0e01\u0e32\u0e23",
+    categories: ["beverage", "health"],
+    time: "5 min",
+    incentive: "Starbucks Card 200 THB x5",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSeZ2pO_0xkXaYvZbzpvgwbayxBpHp_zcrGOZ7z_1thZJENLbg/viewform"
+  },
+  {
+    title: "Ice Cream Consumption Behavior",
+    title_th: "\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e17\u0e32\u0e19\u0e44\u0e2d\u0e28\u0e04\u0e23\u0e35\u0e21",
+    person: "Mew",
+    program: "YMBA",
+    desc: "Survey about ice cream eating behavior, preferences, and consumption patterns.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e17\u0e32\u0e19\u0e44\u0e2d\u0e28\u0e04\u0e23\u0e35\u0e21 \u0e04\u0e27\u0e32\u0e21\u0e0a\u0e2d\u0e1a \u0e41\u0e25\u0e30\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a\u0e01\u0e32\u0e23\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04",
+    categories: ["food"],
+    time: "5-7 min",
+    incentive: "Starbucks Card 200 THB x5",
+    link: "https://forms.gle/MhXNBqhNGTmbZ5hq5"
+  },
+  {
+    title: "TryHeart - Singles Activity Club",
+    title_th: "TryHeart - \u0e04\u0e25\u0e31\u0e1a\u0e01\u0e34\u0e08\u0e01\u0e23\u0e23\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e04\u0e19\u0e42\u0e2a\u0e14",
+    person: "Keng",
+    program: "YMBA 31/1",
+    desc: "Business plan research for 'TryHeart' \u2014 a healing activities club for single working professionals aged 25-40 in Bangkok. Explores interest in social wellness events.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e41\u0e1c\u0e19\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08 'TryHeart' \u0e04\u0e25\u0e31\u0e1a\u0e01\u0e34\u0e08\u0e01\u0e23\u0e23\u0e21\u0e2e\u0e35\u0e25\u0e43\u0e08\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e04\u0e19\u0e42\u0e2a\u0e14\u0e27\u0e31\u0e22\u0e17\u0e33\u0e07\u0e32\u0e19 \u0e2d\u0e32\u0e22\u0e38 25-40 \u0e1b\u0e35 \u0e43\u0e19 \u0e01\u0e17\u0e21./\u0e1b\u0e23\u0e34\u0e21\u0e13\u0e11\u0e25",
+    categories: ["lifestyle", "consumer"],
+    time: "5-10 min",
+    incentive: null,
+    link: "https://docs.google.com/forms/d/e/1FAIpQLScS-LYM8WdCxouvGggsyYp8FbnZyVJt0WaE_fsf1nm-aBtjDw/viewform"
+  },
+  {
+    title: "Personal Memory & Life Documentation",
+    title_th: "\u0e01\u0e32\u0e23\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e04\u0e27\u0e32\u0e21\u0e17\u0e23\u0e07\u0e08\u0e33\u0e41\u0e25\u0e30\u0e0a\u0e35\u0e27\u0e34\u0e15\u0e2a\u0e48\u0e27\u0e19\u0e15\u0e31\u0e27",
+    person: "Andrew",
+    program: "MBA ENG #19",
+    desc: "Research on personal memory recording and life documentation behaviors. How people capture and preserve personal moments and memories.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e04\u0e27\u0e32\u0e21\u0e17\u0e23\u0e07\u0e08\u0e33\u0e41\u0e25\u0e30\u0e0a\u0e35\u0e27\u0e34\u0e15\u0e2a\u0e48\u0e27\u0e19\u0e15\u0e31\u0e27 \u0e27\u0e34\u0e18\u0e35\u0e17\u0e35\u0e48\u0e1c\u0e39\u0e49\u0e04\u0e19\u0e40\u0e01\u0e47\u0e1a\u0e23\u0e31\u0e01\u0e29\u0e32\u0e0a\u0e48\u0e27\u0e07\u0e40\u0e27\u0e25\u0e32\u0e41\u0e25\u0e30\u0e04\u0e27\u0e32\u0e21\u0e17\u0e23\u0e07\u0e08\u0e33",
+    categories: ["lifestyle", "consumer"],
+    time: null,
+    incentive: null,
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSdYcUmw4PDJ3X_9c94wFIa36Bgxgo-vvJrtNM0CEGs1B9vyyQ/formResponse"
+  },
+  {
+    title: "Healthy Yogurt & Wellness Drinks",
+    title_th: "\u0e42\u0e22\u0e40\u0e01\u0e34\u0e23\u0e4c\u0e15\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e",
+    person: "Mai",
+    program: "YMBA",
+    desc: "Survey on healthy yogurt smoothie and wellness drink consumption behavior. Open to both yogurt consumers and non-consumers.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e33\u0e23\u0e27\u0e08\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e1b\u0e23\u0e30\u0e17\u0e32\u0e19\u0e42\u0e22\u0e40\u0e01\u0e34\u0e23\u0e4c\u0e15\u0e1b\u0e31\u0e48\u0e19\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e \u0e44\u0e21\u0e48\u0e17\u0e32\u0e19\u0e42\u0e22\u0e40\u0e01\u0e34\u0e23\u0e4c\u0e15\u0e01\u0e47\u0e15\u0e2d\u0e1a\u0e44\u0e14\u0e49",
+    categories: ["beverage", "health"],
+    time: null,
+    incentive: null,
+    link: "https://forms.gle/E93p2CY3LcM9CmV68"
+  },
+  {
+    title: "Northern Thai Tea",
+    title_th: "\u0e0a\u0e32\u0e40\u0e21\u0e35\u0e48\u0e22\u0e07 / \u0e0a\u0e32\u0e40\u0e2b\u0e19\u0e37\u0e2d",
+    person: "Nao",
+    program: "MBA ENG #19",
+    desc: "Research on Northern Thai tea (Cha Muang / traditional Thai teas) \u2014 consumer interest, awareness, and market potential.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e0a\u0e32\u0e40\u0e21\u0e35\u0e48\u0e22\u0e07/\u0e0a\u0e32\u0e44\u0e17\u0e22\u0e14\u0e31\u0e49\u0e07\u0e40\u0e14\u0e34\u0e21 \u0e04\u0e27\u0e32\u0e21\u0e2a\u0e19\u0e43\u0e08 \u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e23\u0e39\u0e49 \u0e41\u0e25\u0e30\u0e28\u0e31\u0e01\u0e22\u0e20\u0e32\u0e1e\u0e17\u0e32\u0e07\u0e15\u0e25\u0e32\u0e14",
+    categories: ["beverage", "consumer"],
+    time: null,
+    incentive: null,
+    link: "https://forms.gle/mnwXAyUmr6shuwAW8"
+  },
+  {
+    title: "Genuine Leather Bag Purchasing",
+    title_th: "\u0e01\u0e32\u0e23\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e0b\u0e37\u0e49\u0e2d\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e2b\u0e19\u0e31\u0e07\u0e41\u0e17\u0e49",
+    person: "Pink",
+    program: "MBA ENG",
+    desc: "Consumer behavior study on purchasing genuine leather bags \u2014 brand preferences, decision factors, and buying habits.",
+    desc_th: "\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e0b\u0e37\u0e49\u0e2d\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e2b\u0e19\u0e31\u0e07\u0e41\u0e17\u0e49 \u0e04\u0e27\u0e32\u0e21\u0e0a\u0e2d\u0e1a\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c \u0e1b\u0e31\u0e08\u0e08\u0e31\u0e22\u0e01\u0e32\u0e23\u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08 \u0e41\u0e25\u0e30\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e0b\u0e37\u0e49\u0e2d",
+    categories: ["consumer", "lifestyle"],
+    time: null,
+    incentive: "Shopee E-Coupon 200 THB x5",
+    link: "https://forms.gle/t49WbZo3DLfwdBM1A"
+  },
+  {
+    title: "Freshly Cooked Pet Food",
+    title_th: "\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e31\u0e15\u0e27\u0e4c\u0e40\u0e25\u0e35\u0e49\u0e22\u0e07\u0e1b\u0e23\u0e38\u0e07\u0e2a\u0e14\u0e43\u0e2b\u0e21\u0e48",
+    person: "Unknown",
+    program: "MBA (Chula)",
+    desc: "Survey on freshly prepared pet food for dogs and cats in Thailand. For pet owners \u2014 explores feeding habits and interest in fresh alternatives.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e33\u0e23\u0e27\u0e08\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e31\u0e15\u0e27\u0e4c\u0e40\u0e25\u0e35\u0e49\u0e22\u0e07\u0e1b\u0e23\u0e38\u0e07\u0e2a\u0e14\u0e43\u0e2b\u0e21\u0e48\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e2a\u0e38\u0e19\u0e31\u0e02\u0e41\u0e25\u0e30\u0e41\u0e21\u0e27 \u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e1c\u0e39\u0e49\u0e40\u0e25\u0e35\u0e49\u0e22\u0e07\u0e2a\u0e31\u0e15\u0e27\u0e4c",
+    categories: ["pets", "consumer"],
+    time: "2-3 min",
+    incentive: "10% Xiaomi coupon (Shopee)",
+    link: "https://forms.gle/i4UT3HirJPYt8Vgd9"
+  },
+  {
+    title: "Tam's IS Questionnaire",
+    title_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21 IS \u0e02\u0e2d\u0e07\u0e41\u0e15\u0e4b\u0e21",
+    person: "Tam",
+    program: "MBA ENG",
+    desc: "Independent study questionnaire from MBA English program.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30\u0e42\u0e1b\u0e23\u0e41\u0e01\u0e23\u0e21 MBA English",
+    categories: ["consumer"],
+    time: null,
+    incentive: null,
+    link: "https://forms.gle/AKKtnQPy1vAqA1a99"
+  },
+  {
+    title: "Bo's IS Questionnaire",
+    title_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21 IS \u0e02\u0e2d\u0e07\u0e42\u0e1a",
+    person: "Bo",
+    program: "MBA ENG #19",
+    desc: "Independent study questionnaire from MBA English #19 program. Respondents may receive Maybelline products.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30 MBA English #19 \u0e21\u0e35\u0e25\u0e38\u0e49\u0e19\u0e23\u0e31\u0e1a\u0e1c\u0e25\u0e34\u0e15\u0e20\u0e31\u0e13\u0e11\u0e4c Maybelline",
+    categories: ["consumer"],
+    time: null,
+    incentive: "Maybelline products",
+    link: "https://forms.gle/CTY6vvm5vZmTpYqS6"
+  },
+  {
+    title: "New's IS Questionnaire",
+    title_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21 IS \u0e02\u0e2d\u0e07\u0e19\u0e34\u0e27",
+    person: "New",
+    program: "MBA ENG #19",
+    desc: "Independent study questionnaire from MBA English #19 program.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30 MBA English #19",
+    categories: ["consumer"],
+    time: null,
+    incentive: "Starbucks E-Voucher",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSdyXMSxkRNPDqmrfKGIw6a0U15L1as9x4ZFpejUKfNLf0u-Tg/viewform"
+  },
+  {
+    title: "After You Brand Perception",
+    title_th: "\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e23\u0e39\u0e49\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c After You",
+    person: "Phing",
+    program: "MBA ENG #19",
+    desc: "Consumer perception study of the 'After You' dessert cafe brand. Explores brand awareness, attitudes, and purchase intention.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e23\u0e39\u0e49\u0e02\u0e2d\u0e07\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e15\u0e48\u0e2d\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c After You \u0e04\u0e27\u0e32\u0e21\u0e15\u0e23\u0e30\u0e2b\u0e19\u0e31\u0e01\u0e23\u0e39\u0e49 \u0e17\u0e31\u0e28\u0e19\u0e04\u0e15\u0e34 \u0e41\u0e25\u0e30\u0e04\u0e27\u0e32\u0e21\u0e15\u0e31\u0e49\u0e07\u0e43\u0e08\u0e0b\u0e37\u0e49\u0e2d",
+    categories: ["food", "consumer"],
+    time: "5-10 min",
+    incentive: "Grab Voucher 200 THB x5",
+    link: "https://forms.gle/5somr5oEA4eB1YdY8"
+  },
+  {
+    title: "Financial & Investment Social Media",
+    title_th: "\u0e2a\u0e37\u0e48\u0e2d\u0e2d\u0e2d\u0e19\u0e44\u0e25\u0e19\u0e4c\u0e01\u0e32\u0e23\u0e40\u0e07\u0e34\u0e19\u0e41\u0e25\u0e30\u0e01\u0e32\u0e23\u0e25\u0e07\u0e17\u0e38\u0e19",
+    person: "Paul",
+    program: "MBA ENG #19",
+    desc: "Research on consumer behavior regarding financial and investment content on social media. How people consume and engage with fintech/finance media.",
+    desc_th: "\u0e27\u0e34\u0e08\u0e31\u0e22\u0e1e\u0e24\u0e15\u0e34\u0e01\u0e23\u0e23\u0e21\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e0a\u0e21\u0e2a\u0e37\u0e48\u0e2d\u0e2d\u0e2d\u0e19\u0e44\u0e25\u0e19\u0e4c\u0e14\u0e49\u0e32\u0e19\u0e01\u0e32\u0e23\u0e40\u0e07\u0e34\u0e19\u0e41\u0e25\u0e30\u0e01\u0e32\u0e23\u0e25\u0e07\u0e17\u0e38\u0e19",
+    categories: ["finance", "consumer"],
+    time: "5-10 min",
+    incentive: "Grab E-Voucher 100 THB x10",
+    link: "https://forms.gle/VJTodpkGvdoc882K6"
+  },
+  {
+    title: "MBA IS Survey (Unspecified)",
+    title_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21 IS MBA (\u0e44\u0e21\u0e48\u0e23\u0e30\u0e1a\u0e38\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d)",
+    person: "Unknown",
+    program: "MBA (Chula)",
+    desc: "Independent study survey \u2014 topic unspecified in the original post.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30 \u0e44\u0e21\u0e48\u0e23\u0e30\u0e1a\u0e38\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e43\u0e19\u0e42\u0e1e\u0e2a\u0e15\u0e4c\u0e15\u0e49\u0e19\u0e09\u0e1a\u0e31\u0e1a",
+    categories: ["consumer"],
+    time: null,
+    incentive: null,
+    link: "https://forms.gle/M6yMFkPmSqAkWfxS6"
+  },
+  {
+    title: "IS Research Questionnaire",
+    title_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e27\u0e34\u0e08\u0e31\u0e22 IS",
+    person: "Unknown",
+    program: "MBA (Chula)",
+    desc: "Independent study research questionnaire. Respondents can win Grab vouchers.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e27\u0e34\u0e08\u0e31\u0e22\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30 \u0e21\u0e35\u0e25\u0e38\u0e49\u0e19\u0e23\u0e31\u0e1a\u0e1a\u0e31\u0e15\u0e23 Grab",
+    categories: ["consumer"],
+    time: "8-10 min",
+    incentive: "Grab Voucher 100 THB x5",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLScImumStOLe6MZTBH1mGa7HgKiKxFJN_YBqmt0347xZw2hS6Q/viewform"
+  },
+  {
+    title: "General MBA Research",
+    title_th: "\u0e27\u0e34\u0e08\u0e31\u0e22 MBA \u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b",
+    person: "Unknown",
+    program: "MBA (Chula)",
+    desc: "MBA research survey from the Faculty of Commerce and Accountancy, Chulalongkorn University. Includes chance to win Grab e-vouchers.",
+    desc_th: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e27\u0e34\u0e08\u0e31\u0e22 MBA \u0e04\u0e13\u0e30\u0e1e\u0e32\u0e13\u0e34\u0e0a\u0e22\u0e28\u0e32\u0e2a\u0e15\u0e23\u0e4c\u0e41\u0e25\u0e30\u0e01\u0e32\u0e23\u0e1a\u0e31\u0e0d\u0e0a\u0e35 \u0e08\u0e38\u0e2c\u0e32\u0e25\u0e07\u0e01\u0e23\u0e13\u0e4c\u0e21\u0e2b\u0e32\u0e27\u0e34\u0e17\u0e22\u0e32\u0e25\u0e31\u0e22 \u0e21\u0e35\u0e25\u0e38\u0e49\u0e19\u0e23\u0e31\u0e1a Grab e-voucher",
+    categories: ["consumer"],
+    time: "5-10 min",
+    incentive: "Grab E-Voucher 100 THB x5",
+    link: "https://forms.gle/wzzdJuDc4N7Ex6u47"
+  }
+];
+
+// ── i18n ──
+const i18n = {
+  en: {
+    pageTitle: "Chula MBA Surveys 2026",
+    pageSubtitle: "Independent Study questionnaires from Chula MBA students",
+    searchPlaceholder: "Search surveys...",
+    openBtn: "Open",
+    openBtnCard: "Open Survey",
+    countText: (v, t) => `${v} of ${t} surveys`,
+    noTime: "\u2014"
+  },
+  th: {
+    pageTitle: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21 MBA \u0e08\u0e38\u0e2c\u0e32\u0e2f 2026",
+    pageSubtitle: "\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e01\u0e32\u0e23\u0e04\u0e49\u0e19\u0e04\u0e27\u0e49\u0e32\u0e2d\u0e34\u0e2a\u0e23\u0e30\u0e08\u0e32\u0e01 Chula MBA",
+    searchPlaceholder: "\u0e04\u0e49\u0e19\u0e2b\u0e32\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21...",
+    openBtn: "\u0e40\u0e1b\u0e34\u0e14",
+    openBtnCard: "\u0e40\u0e1b\u0e34\u0e14\u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21",
+    countText: (v, t) => `${v} \u0e08\u0e32\u0e01 ${t} \u0e41\u0e1a\u0e1a\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21`,
+    noTime: "\u2014"
+  }
+};
+
+const catColors = {
+  food: 'cat-food',
+  beverage: 'cat-beverage',
+  lifestyle: 'cat-lifestyle',
+  consumer: 'cat-consumer',
+  health: 'cat-health',
+  finance: 'cat-finance',
+  pets: 'cat-pets'
+};
+
+const tbody = document.getElementById('tbody');
+const cardsEl = document.getElementById('cards');
+const searchInput = document.getElementById('search');
+const countEl = document.getElementById('count');
+const filterBtns = document.querySelectorAll('.filter-btn');
+const langToggle = document.getElementById('lang-toggle');
+const lblEn = document.getElementById('lbl-en');
+const lblTh = document.getElementById('lbl-th');
+
+let activeCategory = 'all';
+let sortCol = null;
+let sortAsc = true;
+let lang = 'en';
+
+function t(key) { return i18n[lang][key]; }
+
+function render() {
+  const q = searchInput.value.toLowerCase();
+  let visible = 0;
+
+  tbody.querySelectorAll('tr').forEach(row => {
+    const text = row.dataset.search;
+    const cats = row.dataset.cats.split(',');
+    const show = (!q || text.includes(q)) && (activeCategory === 'all' || cats.includes(activeCategory));
+    row.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+
+  cardsEl.querySelectorAll('.card').forEach(card => {
+    const text = card.dataset.search;
+    const cats = card.dataset.cats.split(',');
+    const show = (!q || text.includes(q)) && (activeCategory === 'all' || cats.includes(activeCategory));
+    card.classList.toggle('hidden', !show);
+  });
+
+  countEl.textContent = t('countText')(visible, surveys.length);
+}
+
+function badgesHTML(categories) {
+  return categories.map(c =>
+    `<span class="badge ${catColors[c] || ''}">${c}</span>`
+  ).join('');
+}
+
+function getTitle(s) { return lang === 'th' ? s.title_th : s.title; }
+function getDesc(s) { return lang === 'th' ? s.desc_th : s.desc; }
+
+function searchText(s) {
+  return [s.title, s.title_th, s.person, s.program, s.desc, s.desc_th, ...s.categories].join(' ').toLowerCase();
+}
+
+function buildTable(data) {
+  tbody.innerHTML = '';
+  cardsEl.innerHTML = '';
+
+  data.forEach(s => {
+    const st = searchText(s);
+    const cats = s.categories.join(',');
+    const badges = badgesHTML(s.categories);
+    const title = getTitle(s);
+    const desc = getDesc(s);
+
+    const tr = document.createElement('tr');
+    tr.dataset.search = st;
+    tr.dataset.cats = cats;
+    tr.innerHTML = `
+      <td class="title">${title}</td>
+      <td class="person">${s.person}</td>
+      <td class="program">${s.program}</td>
+      <td class="desc">${desc}</td>
+      <td>${badges}</td>
+      <td>${s.time || t('noTime')}</td>
+      <td>${s.incentive || t('noTime')}</td>
+      <td><a class="link-btn" href="${s.link}" target="_blank" rel="noopener">${t('openBtn')}</a></td>
+    `;
+    tbody.appendChild(tr);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.search = st;
+    card.dataset.cats = cats;
+    card.innerHTML = `
+      <div class="card-title">${title}</div>
+      <div class="card-meta">
+        <span>${s.person}</span>
+        <span>${s.program}</span>
+        ${s.time ? `<span>${s.time}</span>` : ''}
+      </div>
+      <div class="card-desc">${desc}</div>
+      <div class="card-footer">
+        <div class="card-badges">${badges}</div>
+        ${s.incentive ? `<div class="card-incentive">${s.incentive}</div>` : ''}
+        <a class="link-btn" href="${s.link}" target="_blank" rel="noopener">${t('openBtnCard')}</a>
+      </div>
+    `;
+    cardsEl.appendChild(card);
+  });
+
+  render();
+}
+
+function applyLang() {
+  document.getElementById('page-title').textContent = t('pageTitle');
+  document.getElementById('page-subtitle').textContent = t('pageSubtitle');
+  searchInput.placeholder = t('searchPlaceholder');
+
+  // Update table headers
+  document.querySelectorAll('thead th').forEach(th => {
+    const label = th.dataset[lang];
+    if (label) {
+      const arrow = th.querySelector('.sort-arrow');
+      th.textContent = label + ' ';
+      if (arrow) th.appendChild(arrow);
+    }
+  });
+
+  // Toggle active label
+  lblEn.classList.toggle('active', lang === 'en');
+  lblTh.classList.toggle('active', lang === 'th');
+  langToggle.classList.toggle('th', lang === 'th');
+
+  buildTable(surveys);
+}
+
+function toggleLang() {
+  lang = lang === 'en' ? 'th' : 'en';
+  applyLang();
+}
+
+langToggle.addEventListener('click', toggleLang);
+lblEn.addEventListener('click', () => { if (lang !== 'en') toggleLang(); });
+lblTh.addEventListener('click', () => { if (lang !== 'th') toggleLang(); });
+
+// Sorting
+document.querySelectorAll('thead th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.sort;
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+
+    const sorted = [...surveys].sort((a, b) => {
+      const key = col === 'title' && lang === 'th' ? 'title_th' : col;
+      let va = (a[key] || '').toLowerCase();
+      let vb = (b[key] || '').toLowerCase();
+      return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+
+    document.querySelectorAll('thead th').forEach(h => h.classList.remove('sorted'));
+    th.classList.add('sorted');
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = sortAsc ? '\u25B2' : '\u25BC';
+    buildTable(sorted);
+  });
+});
+
+searchInput.addEventListener('input', render);
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    render();
+  });
+});
+
+applyLang();
+</script>
+</body>
+</html>
