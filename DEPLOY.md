@@ -28,3 +28,5 @@ It typically takes 1-2 minutes for the first deployment.
 - The site is a single `index.html` file with no build step or dependencies.
 - Any push to `main` will automatically redeploy.
 - To use a custom domain, add a `CNAME` file with your domain and configure DNS.
+
+push
